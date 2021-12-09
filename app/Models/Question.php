@@ -13,4 +13,9 @@ class Question extends Model
     {
         return $this->hasMany(Answer::class);
     }
+
+    public function scopePublished($query)
+    {
+        return $query->whereNotNull('published_at');
+    }
 }

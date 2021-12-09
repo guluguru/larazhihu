@@ -3,6 +3,7 @@
 namespace Tests\Unit;
 
 use Tests\TestCase;
+use Carbon\Carbon;
 use App\Models\Answer;
 use App\Models\Question;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -21,5 +22,19 @@ class QuestionTest extends TestCase
         Answer::factory()->create(['question_id' => $question->id]);
 
         $this->assertInstanceOf('Illuminate\Database\Eloquent\Relations\HasMany', $question->answers());
+    }
+
+    /** @test */
+    public function questions_with_published_at_date_are_published()
+    {
+        $publishedQuestion1 = Question::factory()->published()->create();
+        $publishedQuestion2 = Question::factory()->published()->create();
+        $unpublishedQuestion = Question::factory()->unpublished()->create();
+
+        $publishedQuestions = Question::published()->get();
+
+        $this->assertTrue($publishedQuestions->contains($publishedQuestion1));
+        $this->assertTrue($publishedQuestions->contains($publishedQuestion2));
+        $this->assertFalse($publishedQuestions->contains($unpublishedQuestion));
     }
 }

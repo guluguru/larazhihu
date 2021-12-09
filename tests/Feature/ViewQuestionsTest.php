@@ -38,17 +38,4 @@ class ViewQuestionsTest extends TestCase
             ->get('/questions/' . $question->id)
             ->assertStatus(404);
     }
-
-    /** @test */
-    public function user_can_view_a_single_question()
-    {
-        // 1. 创建一个问题
-        $question = Question::factory()->create();
-        // 2. 访问链接
-        $test = $this->get('/questions/' . $question->id);
-        // 3. 那么应该看到问题的内容
-        $test->assertStatus(200)
-            ->assertSee($question->title)
-            ->assertSee($question->content);
-    }
 }
