@@ -49,10 +49,36 @@ class PostAnswersTest extends TestCase
     }
 
     /** @test */
+    public function guests_may_not_post_an_answer()
+    {
+        $this->withExceptionHandling();
+        $question = Question::factory()->published()->create();
+
+        $response = $this->post("/questions/{$question->id}/answers", [
+            'content' => 'This is an answer.'
+        ]);
+
+        $response->assertStatus(302)
+            ->assertRedirect('/login');
+    }
+
+    /** @test */
+    public function guests_may_not_post_an_answer_method2()
+    {
+        $this->expectException('Illuminate\Auth\AuthenticationException');
+
+        $question = Question::factory()->published()->create();
+
+        $this->post("/questions/{$question->id}/answers", [
+            'content' => 'This is an answer.'
+        ]);
+    }
+
+    /** @test */
     public function can_not_post_an_answer_to_an_unpublished_question()
     {
         $question = Question::factory()->unpublished()->create();
-        $user = User::factory()->create();
+        $this->actingAs($user = User::factory()->create());
 
         $response = $this->withExceptionHandling()
             ->post("/questions/{$question->id}/answers", [
@@ -72,7 +98,7 @@ class PostAnswersTest extends TestCase
         $this->withExceptionHandling();
 
         $question = Question::factory()->published()->create();
-        $user = User::factory()->create();
+        $this->actingAs($user = User::factory()->create());
 
         $response = $this->post("/questions/{$question->id}/answers", [
             'user_id' => $user->id,
